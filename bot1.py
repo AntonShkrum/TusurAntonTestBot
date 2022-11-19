@@ -21,8 +21,15 @@ def get_content(html):
     soup = BeautifulSoup(html, 'html.parser')
     par = []
     global m
+    from datetime import datetime, timedelta 
+    now = datetime.now()
+    sep = datetime(now.year if now.month >= 9 else now.year - 1, 9, 1)
+    d1 = sep - timedelta(days=sep.weekday())
+    d2 = now - timedelta(days=now.weekday())
+    parity = ((d2 - d1).days // 7) % 2
+    week = format("even" if parity else "odd")
     for n in range(0, 7):
-        items = soup.find(class_="table table-bordered table-condensed hidden-xs hidden-sm table-lessons even").find_all('td', class_='lesson_cell day_'+ str(n)+' current_day')
+        items = soup.find(class_="table table-bordered table-condensed hidden-xs hidden-sm table-lessons " + week).find_all('td', class_='lesson_cell day_'+ str(n)+' current_day')
         for item in items:
             if item.find('h4') is not None:
                 par.append(
@@ -47,8 +54,8 @@ def out(par, m):
 
 #Ботинок
 bot = telebot.TeleBot('5699590709:AAGDo97tyzkTgG-l7nF6Nomnft9EHlcNF0g')
-group = '441-1'
-facultet = 'fsu'
+group = ''
+facultet = ''
 m = 0
 
 
@@ -97,5 +104,6 @@ def raspisanie(message):
 
 
 bot.infinity_polling()
+
 
 
