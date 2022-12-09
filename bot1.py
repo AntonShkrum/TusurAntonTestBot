@@ -58,16 +58,31 @@ group = ''
 facultet = ''
 m = 0
 
+markup = types.ReplyKeyboardMarkup(resize_keyboard = True, row_width=2) 
+start = types.KeyboardButton('/start') 
+raspisanie = types.KeyboardButton('/raspisanie')
+avtomat = types.KeyboardButton('/avtomat') 
+zachet = types.KeyboardButton('/zachet') 
+settings = types.KeyboardButton('/settings') 
+instruction = types.KeyboardButton('/instruction') 
+markup.add(start, raspisanie, avtomat, zachet, settings, instruction)
 
 
 @bot.message_handler(commands=['start'])
 def start(message):
     mess = f'Привет, <b>{message.from_user.first_name}</b>'
-    markup = types.ReplyKeyboardMarkup(resize_keyboard = True, row_width=1) 
-    start = types.KeyboardButton('/start') 
-    raspisanie = types.KeyboardButton('/raspisanie')
-    markup.add(start, raspisanie)
     bot.send_message(message.chat.id, mess, parse_mode='html', reply_markup=markup)
+    bot.send_message(message.chat.id, f'Я бот ТУСУРа! У меня есть несколько функций, которые могут быть для тебя полезными. Первая функция - /raspisanie, эта команда покажет тебе расписание на сегодня. Для начала работы с этой командой необходимо настроить группу и факультет через команду    /settings.', parse_mode='html')
+    bot.send_message(message.chat.id, f'Также ты можешь узнать как получить зачет или автомат через команды: /zachet, /avtomat. Если ты только поступил в ТУСУР, ты можешь посмотреть на инструкцию для первокурсников нажав на /instruction.', parse_mode='html')
+
+@bot.message_handler(commands=['instruction'])
+def instruction(message):
+    photo = open('instrukt.png', 'rb')
+    bot.send_photo(message.chat.id, photo)
+
+
+@bot.message_handler(commands=['settings'])
+def settings(message):
     bot.send_message(message.chat.id, f'Введи факультет(в формате "rtf, fvs, fet, ef, yuf, zivf, rkf, fsu, fit, gf, fb"): ', parse_mode='html')
     bot.register_next_step_handler(message, get_FACULTET)
 
@@ -80,7 +95,7 @@ def get_FACULTET(message):
 def get_GROUP(message):
     global group
     group = message.text
-    bot.send_message(message.chat.id, f'Настройки успешно установлены. Если необходимо поменять настройки, введи /start. Сейчас нажми на /raspisanie, чтобы увидеть твое расписание на сегодня.', parse_mode='html')
+    bot.send_message(message.chat.id, f'Настройки успешно установлены. Если необходимо поменять настройки, введи /settings. Сейчас нажми на /raspisanie, чтобы увидеть твое расписание на сегодня.', parse_mode='html')
 
 
 @bot.message_handler(commands=['raspisanie'])
@@ -100,7 +115,16 @@ def raspisanie(message):
         else:
             bot.send_message(message.chat.id, f'Сегодня пар нет!', parse_mode='html')
     else:
-        bot.send_message(message.chat.id, f'Настройки установлены неверно. Для смены настроек введи /start', parse_mode='html')
+        bot.send_message(message.chat.id, f'Настройки установлены неверно. Для смены настроек введи /settings', parse_mode='html')
+
+
+@bot.message_handler(commands=['avtomat'])
+def avtomat(message):
+    bot.send_message(message.chat.id, f'«Автомат» как форма оценки знаний должен быть отмечен в «Положениях о зачётах и экзаменах» учебного учреждения, прописаны конкретные критерии, которым надо соответствовать, чтобы вам оценку ставили автоматически. Выполняете все требования — получаете «автомат» по учебной дисциплине.', parse_mode='html')
+
+@bot.message_handler(commands=['zachet'])
+def zachet(message):
+    bot.send_message(message.chat.id, f'Зачёт можно получить автоматом, если сам преподаватель сочтёт это возможным. Официально ничего не закреплено, и в этом случае необходимо, чтобы преподаватель вас отметил для себя как старательного и добросовестного студента. Субъективное мнение будет играть весомую роль, порой даже большее, чем все учебные заслуги.', parse_mode='html')
 
 
 bot.infinity_polling()
